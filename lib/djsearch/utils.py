@@ -1,0 +1,19 @@
+# coding: utf-8
+from django.contrib.contenttypes.models import ContentType
+
+
+def get_contenttype(instance_or_class):
+    if isinstance(instance_or_class, ContentType):
+        return instance_or_class
+    return ContentType.objects.get_for_model(instance_or_class)
+
+
+def get_natural_key(instance_or_class):
+    return get_contenttype(instance_or_class).natural_key()
+
+
+def from_natual_key(app_lable, model_name, **queries):
+    ct = ContentType.objects.get_by_natural_key(app_lable, model_name)
+    if queries:
+        return ct.get_object_for_this_type(**queries)
+    return ct.model_class()
