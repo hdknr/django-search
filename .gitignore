@@ -1,0 +1,13 @@
+# Python
+*.pyc
+*.pyo
+.*.swp
+*.egg-info
+dist
+
+# Sphinx
+docs/build
+build
+
+# OS files
+.DS_Store

@@ -1,0 +1,10 @@
+# Django
+django
+
+# Elasticsearch
+elasticsearch
+elasticsearch-dsl
+
+# tools
+django-click
+
