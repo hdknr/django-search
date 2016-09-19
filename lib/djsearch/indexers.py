@@ -3,8 +3,13 @@ from __future__ import unicode_literals
 from django.db.models.signals import post_save, post_delete
 import elasticsearch_dsl as dsl
 from elasticsearch_dsl.document import DocTypeMeta
+from elasticsearch_dsl.connections import connections
+
 from .utils import to_natural_key_string
 from .settings import ELASTICSEARCH
+
+
+es = connections.create_connection(**ELASTICSEARCH)
 
 
 class ModelDocTypeMeta(DocTypeMeta):
