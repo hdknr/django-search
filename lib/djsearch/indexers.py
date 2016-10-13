@@ -48,9 +48,12 @@ class ModelDocType(dsl.DocType):
             cls(instance=instance).save()
 
     @classmethod
-    def on_delete(cls, sender, instance, created, **kwargs):
+    def on_delete(cls, sender, instance, **kwargs):
         if isinstance(instance, cls._model):
-            cls(instance=instance).delete()
+            try:
+                cls(instance=instance).delete()
+            except:
+                pass
 
     @classmethod
     def init(cls):
