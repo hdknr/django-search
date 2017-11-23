@@ -23,5 +23,5 @@ def from_natual_key(app_lable, model_name, **queries):
     return ct.model_class()
 
 
-def from_natual_key_string(natural_key_string, **queries):
+def from_natural_key_string(natural_key_string, **queries):
     return from_natual_key(*natural_key_string.split('.'), **queries)

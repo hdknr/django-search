@@ -1,5 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
 from django.db.models.signals import post_save, post_delete
 import elasticsearch_dsl as dsl
 from elasticsearch_dsl.document import DocTypeMeta
@@ -13,6 +11,7 @@ es = connections.create_connection(**ELASTICSEARCH)
 
 
 class ModelDocTypeMeta(DocTypeMeta):
+
     def __new__(cls, name, bases, attrs):
         if 'Meta' in attrs and hasattr(attrs['Meta'], 'model'):
             attrs['Meta'].doc_type = to_natural_key_string(attrs['Meta'].model)
@@ -23,8 +22,7 @@ class ModelDocTypeMeta(DocTypeMeta):
         return ret
 
 
-class ModelDocType(dsl.DocType):
-    __metaclass__ = ModelDocTypeMeta
+class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
 
     def __init__(self, **kwargs):
         instance = kwargs.pop('instance', None)
