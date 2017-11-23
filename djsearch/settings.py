@@ -1,5 +1,3 @@
-# coding: utf-8
-
 from django.conf import settings
 
 DJSEARCH = getattr(settings, 'DJSEARCH', {})

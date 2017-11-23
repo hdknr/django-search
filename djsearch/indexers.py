@@ -43,7 +43,10 @@ class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
     @classmethod
     def on_save(cls, sender, instance, created, **kwargs):
         if isinstance(instance, cls._model):
-            cls(instance=instance).save()
+            try:
+                cls(instance=instance).save()
+            except KeyError:
+                pass
 
     @classmethod
     def on_delete(cls, sender, instance, **kwargs):
@@ -56,5 +59,6 @@ class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
     @classmethod
     def init(cls):
         super(ModelDocType, cls).init()
-        post_save.connect(cls.on_save, sender=cls._model)
-        post_delete.connect(cls.on_delete, sender=cls._model)
+        if hasattr(cls, '_model'):
+            post_save.connect(cls.on_save, sender=cls._model)
+            post_delete.connect(cls.on_delete, sender=cls._model)
