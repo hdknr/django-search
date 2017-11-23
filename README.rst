@@ -1,4 +1,5 @@
 djsearch
 ========================================================================
 
-under development.
+- under development.
+- python2
