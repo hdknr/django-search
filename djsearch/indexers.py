@@ -24,17 +24,17 @@ class ModelDocTypeMeta(DocTypeMeta):
 
 class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
 
-    def __init__(self, **kwargs):
-        instance = kwargs.pop('instance', None)
-        if instance:
-            params = dict(
-                (i, getattr(instance, i))
-                for i in self._doc_type.mapping)
-            params.update(kwargs)
-            kwargs = params
-        super(ModelDocType, self).__init__(**kwargs)
-        if instance:
-            self.meta.id = instance.pk
+    def __init__(self, instance, meta=None, **kwargs):
+        kwargs = self.map_instance(instance) or kwargs
+        meta = meta or {'id': instance.id}
+        super(ModelDocType, self).__init__(meta=meta, **kwargs)
+
+    def map_instance(self, instance, kwargs={}):
+        params = dict(
+            (i, getattr(instance, i, None))
+            for i in self._doc_type.mapping)
+        params.update(kwargs)
+        return params
 
     @classmethod
     def from_hit(cls, hit):
