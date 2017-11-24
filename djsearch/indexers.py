@@ -1,5 +1,4 @@
 from django.db.models.signals import post_save, post_delete
-from django.utils.functional import cached_property
 import elasticsearch_dsl as dsl
 from elasticsearch_dsl.document import DocTypeMeta
 from elasticsearch_dsl.connections import connections
@@ -30,13 +29,13 @@ class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
         meta = meta or {'id': instance.id}
         super(ModelDocType, self).__init__(meta=meta, **kwargs)
 
-    @cached_property
-    def map_data(self):
+    def map_data(self, instance):
         return {}
 
     def map_instance(self, instance, kwargs={}):
+        data = self.map_data(instance)
         params = dict(
-            [(i, self.map_data.get(i, getattr(instance, i, None)))
+            [(i, data.get(i, getattr(instance, i, None)))
              for i in self._doc_type.mapping],
             **kwargs)
         return params
@@ -49,7 +48,7 @@ class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
     def on_save(cls, sender, instance, created, **kwargs):
         if isinstance(instance, cls._model):
             try:
-                cls(instance=instance).save()
+                cls(instance=instance, **kwargs).save()
             except KeyError:
                 pass
 
@@ -57,7 +56,7 @@ class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
     def on_delete(cls, sender, instance, **kwargs):
         if isinstance(instance, cls._model):
             try:
-                cls(instance=instance).delete()
+                cls(instance=instance, **kwargs).delete()
             except:
                 pass
 
