@@ -1,4 +1,5 @@
 from django.db.models.signals import post_save, post_delete
+from django.utils.functional import cached_property
 import elasticsearch_dsl as dsl
 from elasticsearch_dsl.document import DocTypeMeta
 from elasticsearch_dsl.connections import connections
@@ -29,11 +30,15 @@ class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
         meta = meta or {'id': instance.id}
         super(ModelDocType, self).__init__(meta=meta, **kwargs)
 
+    @cached_property
+    def map_data(self):
+        return {}
+
     def map_instance(self, instance, kwargs={}):
         params = dict(
-            (i, getattr(instance, i, None))
-            for i in self._doc_type.mapping)
-        params.update(kwargs)
+            [(i, self.map_data.get(i, getattr(instance, i, None)))
+             for i in self._doc_type.mapping],
+            **kwargs)
         return params
 
     @classmethod
