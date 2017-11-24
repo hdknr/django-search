@@ -24,9 +24,10 @@ class ModelDocTypeMeta(DocTypeMeta):
 
 class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
 
-    def __init__(self, instance, meta=None, **kwargs):
-        kwargs = self.map_instance(instance) or kwargs
-        meta = meta or {'id': instance.id}
+    def __init__(self, instance=None, meta=None, **kwargs):
+        if instance and instance.id:
+            kwargs = self.map_instance(instance) or kwargs
+            meta = meta or {'id': instance.id}
         super(ModelDocType, self).__init__(meta=meta, **kwargs)
 
     def map_data(self, instance):
