@@ -4,30 +4,28 @@ from elasticsearch_dsl.document import DocTypeMeta
 from elasticsearch_dsl.connections import connections
 
 from .utils import to_natural_key_string
-from .settings import ELASTICSEARCH
+from .settings import djsearch_settings as settings
 
 
-es = connections.create_connection(**ELASTICSEARCH)
+es = connections.create_connection(**settings.ELASTICSEARCH)
 
 
 class ModelDocTypeMeta(DocTypeMeta):
-
     def __new__(cls, name, bases, attrs):
-        if 'Meta' in attrs and hasattr(attrs['Meta'], 'model'):
-            attrs['Meta'].doc_type = to_natural_key_string(attrs['Meta'].model)
-            attrs['_model'] = attrs['Meta'].model
-            if not hasattr(attrs['Meta'], 'index'):
-                attrs['Meta'].index = ELASTICSEARCH['index']
+        if "Meta" in attrs and hasattr(attrs["Meta"], "model"):
+            attrs["Meta"].doc_type = to_natural_key_string(attrs["Meta"].model)
+            attrs["_model"] = attrs["Meta"].model
+            if not hasattr(attrs["Meta"], "index"):
+                attrs["Meta"].index = settings.ELASTICSEARCH["index"]
         ret = super(ModelDocTypeMeta, cls).__new__(cls, name, bases, attrs)
         return ret
 
 
 class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
-
     def __init__(self, instance=None, meta=None, **kwargs):
         if instance and instance.id:
             kwargs = self.map_instance(instance) or kwargs
-            meta = meta or {'id': instance.id}
+            meta = meta or {"id": instance.id}
         super(ModelDocType, self).__init__(meta=meta, **kwargs)
 
     def map_data(self, instance):
@@ -36,9 +34,12 @@ class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
     def map_instance(self, instance, kwargs={}):
         data = self.map_data(instance)
         params = dict(
-            [(i, data.get(i, getattr(instance, i, None)))
-             for i in self._doc_type.mapping],
-            **kwargs)
+            [
+                (i, data.get(i, getattr(instance, i, None)))
+                for i in self._doc_type.mapping
+            ],
+            **kwargs
+        )
         return params
 
     @classmethod
@@ -64,6 +65,6 @@ class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
     @classmethod
     def init(cls):
         super(ModelDocType, cls).init()
-        if hasattr(cls, '_model'):
+        if hasattr(cls, "_model"):
             post_save.connect(cls.on_save, sender=cls._model)
             post_delete.connect(cls.on_delete, sender=cls._model)
