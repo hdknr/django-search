@@ -1,5 +1,5 @@
-from django.apps import AppConfig
+from django import apps
 
 
-class DjsearchConfig(AppConfig):
-    name = 'djsearch'
+class AppConfig(apps.AppConfig):
+    name = "djsearch"

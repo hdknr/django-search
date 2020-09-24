@@ -1,2 +1,2 @@
-__version__ =  '0.0.1'
-default_app_config = 'djsearch.apps.DjsearchConfig'
+__version__ = "0.0.1"
+default_app_config = "djsearch.apps.AppConfig"

@@ -3,11 +3,11 @@ This product includes software developed at:
 * hdknr
 * Lafoglia,Inc
 
-Copyright 2017  Hideki Nara
+Copyright 2017-2020  Hideki Nara
 
 Brand names include, but are not limited to:
 
-* djsearch
+* django-search
 
 this software without prior written permission of Hideki Nara.
 

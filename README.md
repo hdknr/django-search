@@ -1,4 +1,3 @@
-djsearch
-========================================================================
+# django-search
 
-under development.
+- Elasticsearch backend
