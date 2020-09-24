@@ -119,3 +119,8 @@ STATIC_URL = "/static/"
 #######
 LANGUAGE_CODE = "ja"
 TIME_ZONE = "Asia/Tokyo"
+DJSEARCH = {
+    "HOSTS": [
+        "ubn2004",
+    ],
+}

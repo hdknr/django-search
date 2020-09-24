@@ -1,5 +1,6 @@
 from django.conf import settings as dj_settings
 from .settings import Settings as BaseSettings
+from elasticsearch_dsl.connections import connections
 
 
 class Settings(BaseSettings):
@@ -10,6 +11,10 @@ class Settings(BaseSettings):
             port=self.PORT,
             index=self.INDEX,
         )
+
+    @property
+    def CONNECTION(self):
+        return connections.create_connection(**self.ELASTICSEARCH)
 
 
 PARAMS = (
