@@ -11,3 +11,6 @@ build
 
 # OS files
 .DS_Store
+
+# samples
+db.sqlite3
