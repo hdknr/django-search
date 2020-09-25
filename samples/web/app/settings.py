@@ -121,6 +121,8 @@ LANGUAGE_CODE = "ja"
 TIME_ZONE = "Asia/Tokyo"
 DJSEARCH = {
     "HOSTS": [
-        "ubn2004",
+        "192.168.56.56",
     ],
 }
+
+INSTALLED_APPS += ["articles"]

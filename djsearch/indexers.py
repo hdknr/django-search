@@ -1,32 +1,32 @@
 from django.db.models.signals import post_save, post_delete
 import elasticsearch_dsl as dsl
-from elasticsearch_dsl.document import DocTypeMeta
-from elasticsearch_dsl.connections import connections
+from elasticsearch_dsl.document import IndexMeta
 
 from .utils import to_natural_key_string
 from .settings import djsearch_settings as settings
+import traceback
 
 
-es = connections.create_connection(**settings.ELASTICSEARCH)
-
-
-class ModelDocTypeMeta(DocTypeMeta):
+class ModelDocumentMeta(IndexMeta):
     def __new__(cls, name, bases, attrs):
-        if "Meta" in attrs and hasattr(attrs["Meta"], "model"):
-            attrs["Meta"].doc_type = to_natural_key_string(attrs["Meta"].model)
-            attrs["_model"] = attrs["Meta"].model
-            if not hasattr(attrs["Meta"], "index"):
-                attrs["Meta"].index = settings.ELASTICSEARCH["index"]
-        ret = super(ModelDocTypeMeta, cls).__new__(cls, name, bases, attrs)
+        if "Index" in attrs:
+            attrs["_connection"] = getattr(
+                attrs["Index"], "connection", settings.CONNECTION
+            )
+            attrs["_model"] = getattr(attrs["Index"], "model", None)
+            attrs["Index"].name = to_natural_key_string(attrs["_model"])
+
+        ret = super().__new__(cls, name, bases, attrs)
         return ret
 
 
-class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
+class ModelDocument(dsl.Document, metaclass=ModelDocumentMeta):
     def __init__(self, instance=None, meta=None, **kwargs):
         if instance and instance.id:
             kwargs = self.map_instance(instance) or kwargs
             meta = meta or {"id": instance.id}
-        super(ModelDocType, self).__init__(meta=meta, **kwargs)
+        print("????", instance, meta, kwargs)
+        super().__init__(meta=meta, **kwargs)
 
     def map_data(self, instance):
         return {}
@@ -64,7 +64,15 @@ class ModelDocType(dsl.DocType, metaclass=ModelDocTypeMeta):
 
     @classmethod
     def init(cls):
-        super(ModelDocType, cls).init()
+        super().init()
         if hasattr(cls, "_model"):
             post_save.connect(cls.on_save, sender=cls._model)
             post_delete.connect(cls.on_delete, sender=cls._model)
+
+
+html_strip = dsl.analyzer(
+    "html_strip",
+    tokenizer="standard",
+    filter=["standard", "lowercase", "stop", "snowball"],
+    char_filter=["html_strip"],
+)

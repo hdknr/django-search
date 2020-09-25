@@ -1,4 +1,5 @@
 from django.conf import settings as dj_settings
+from django.utils.functional import cached_property
 from .settings import Settings as BaseSettings
 from elasticsearch_dsl.connections import connections
 
@@ -12,7 +13,7 @@ class Settings(BaseSettings):
             index=self.INDEX,
         )
 
-    @property
+    @cached_property
     def CONNECTION(self):
         return connections.create_connection(**self.ELASTICSEARCH)
 
